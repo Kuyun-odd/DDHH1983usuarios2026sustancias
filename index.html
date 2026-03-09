@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios de Sustancias y Derechos Humanos</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --cyan-dim: #00b8cc;
+    --cyan-glow: rgba(0,245,255,0.15);
+    --blue-deep: #0a0e1a;
+    --blue-mid: #0d1b2a;
+    --blue-panel: #0f1f35;
+    --blue-border: #1a3a5c;
+    --blue-accent: #1e6fa5;
+    --neon-green: #39ff14;
+    --neon-blue: #147dff;
+    --text-main: #c8e6f5;
+    --text-dim: #6a8fa8;
+    --red-alert: #ff3d5a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--blue-deep);
+    color: var(--text-main);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* SCANLINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* GRID BG */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 70px 20px 50px;
+    background: linear-gradient(180deg, rgba(0,20,40,0.95) 0%, transparent 100%);
+    border-bottom: 1px solid var(--blue-border);
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 80%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    box-shadow: 0 0 20px var(--cyan);
+  }
+
+  .header-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--cyan);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    animation: blink-tag 3s infinite;
+  }
+
+  @keyframes blink-tag {
+    0%, 90%, 100% { opacity: 1; }
+    95% { opacity: 0.3; }
+  }
+
+  h1.main-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #fff 30%, var(--cyan) 70%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 18px rgba(0,245,255,0.4));
+    animation: title-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes title-pulse {
+    0%, 100% { filter: drop-shadow(0 0 18px rgba(0,245,255,0.4)); }
+    50% { filter: drop-shadow(0 0 30px rgba(0,245,255,0.7)); }
+  }
+
+  .subtitle {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(0.85rem, 2vw, 1.15rem);
+    font-weight: 400;
+    color: var(--cyan-dim);
+    letter-spacing: 0.2em;
+    margin-top: 10px;
+    text-shadow: 0 0 10px var(--cyan-dim);
+  }
+
+  .research-tag {
+    margin-top: 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+  }
+
+  /* ANIMATED DECORATION */
+  .hex-deco {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .hex-deco span {
+    width: 8px; height: 8px;
+    background: var(--cyan);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    animation: hex-pulse 2s ease-in-out infinite;
+  }
+  .hex-deco span:nth-child(2) { animation-delay: 0.3s; background: var(--neon-blue); }
+  .hex-deco span:nth-child(3) { animation-delay: 0.6s; }
+  .hex-deco span:nth-child(4) { animation-delay: 0.9s; background: var(--neon-blue); }
+  .hex-deco span:nth-child(5) { animation-delay: 1.2s; }
+  @keyframes hex-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.4); }
+  }
+
+  /* ===== NAV MENU ===== */
+  #menu {
+    position: relative;
+    z-index: 10;
+    max-width: 960px;
+    margin: 60px auto;
+    padding: 0 24px;
+  }
+
+  .menu-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--cyan);
+    text-align: center;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .menu-btn {
+    position: relative;
+    background: var(--blue-panel);
+    border: 1px solid var(--blue-border);
+    color: var(--text-main);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 22px 24px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+  }
+
+  .menu-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,245,255,0.08), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .menu-btn:hover::before { left: 100%; }
+
+  .menu-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    transition: width 0.4s ease;
+  }
+
+  .menu-btn:hover::after { width: 100%; }
+
+  .menu-btn:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px rgba(0,245,255,0.2), inset 0 0 20px rgba(0,245,255,0.04);
+    color: var(--cyan);
+  }
+
+  .menu-btn .btn-num {
+    font-size: 1.4rem;
+    color: var(--cyan);
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 6px;
+    transition: opacity 0.3s;
+  }
+  .menu-btn:hover .btn-num { opacity: 1; }
+
+  .menu-btn .btn-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cyan);
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  .menu-btn:hover .btn-arrow { opacity: 1; right: 12px; }
+
+  /* ===== SECTION STYLES ===== */
+  .section {
+    position: relative;
+    z-index: 10;
+    max-width: 960px;
+    margin: 0 auto 80px;
+    padding: 0 24px;
+  }
+
+  .section-header {
+    border-left: 3px solid var(--cyan);
+    box-shadow: -4px 0 16px rgba(0,245,255,0.3);
+    padding: 20px 24px;
+    background: linear-gradient(90deg, rgba(0,245,255,0.06) 0%, transparent 60%);
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .section-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.3em;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(0,245,255,0.3);
+    line-height: 1.3;
+  }
+
+  /* SUBSECTION */
+  .subsection {
+    background: var(--blue-panel);
+    border: 1px solid var(--blue-border);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .subsection:hover { border-color: rgba(0,245,255,0.3); }
+
+  .sub-header {
+    padding: 16px 20px;
+    background: rgba(0,245,255,0.04);
+    border-bottom: 1px solid var(--blue-border);
+  }
+
+  .sub-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--cyan-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .sub-body {
+    padding: 20px 24px;
+  }
+
+  .sub-body p, .sub-body li {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--text-main);
+    margin-bottom: 8px;
+  }
+
+  .sub-body ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .sub-body ul li::before {
+    content: '▸ ';
+    color: var(--cyan);
+    font-size: 0.8rem;
+  }
+
+  .sub-body a {
+    color: var(--cyan-dim);
+    text-decoration: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+  .sub-body a:hover { color: var(--cyan); text-shadow: 0 0 6px var(--cyan); }
+
+  /* ALERT BOXES */
+  .alert-box {
+    background: rgba(255,61,90,0.08);
+    border: 1px solid rgba(255,61,90,0.35);
+    border-left: 3px solid var(--red-alert);
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: #ffb3bc;
+    line-height: 1.6;
+    box-shadow: 0 0 12px rgba(255,61,90,0.1);
+  }
+
+  .alert-box::before {
+    content: '⚠ ALERTA: ';
+    color: var(--red-alert);
+    font-weight: bold;
+  }
+
+  /* INFO BOX */
+  .info-box {
+    background: rgba(0,245,255,0.05);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-size: 0.88rem;
+    color: var(--text-main);
+    line-height: 1.7;
+  }
+
+  /* STAT ITEMS */
+  .stat-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,245,255,0.06);
+  }
+  .stat-row:last-child { border-bottom: none; }
+
+  .stat-icon {
+    font-size: 1rem;
+    color: var(--cyan);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .stat-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-main);
+  }
+
+  /* DATA NUMBERS */
+  .data-num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: 0 0 12px var(--cyan);
+    display: inline-block;
+    animation: counter-glow 2.5s ease-in-out infinite;
+  }
+
+  @keyframes counter-glow {
+    0%, 100% { text-shadow: 0 0 8px rgba(0,245,255,0.5); }
+    50% { text-shadow: 0 0 20px rgba(0,245,255,0.9), 0 0 40px rgba(0,245,255,0.3); }
+  }
+
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+
+  .stat-card {
+    background: rgba(0,245,255,0.04);
+    border: 1px solid rgba(0,245,255,0.15);
+    padding: 18px 14px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+
+  .stat-card .stat-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: 0 0 10px rgba(0,245,255,0.6);
+    display: block;
+    animation: counter-glow 2.5s ease-in-out infinite;
+  }
+
+  .stat-card .stat-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    display: block;
+  }
+
+  /* BACK BUTTON */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 32px;
+    padding: 12px 24px;
+    background: transparent;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .back-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,245,255,0.15), transparent);
+    transition: left 0.4s ease;
+  }
+
+  .back-btn:hover::before { left: 100%; }
+
+  .back-btn:hover {
+    background: rgba(0,245,255,0.1);
+    box-shadow: 0 0 20px rgba(0,245,255,0.3), inset 0 0 10px rgba(0,245,255,0.05);
+    text-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue-border), transparent);
+    margin: 60px auto;
+    max-width: 960px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .section-divider::after {
+    content: '◆';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--blue-deep);
+    color: var(--blue-border);
+    padding: 0 8px;
+    font-size: 0.6rem;
+  }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .data-table th {
+    background: rgba(0,245,255,0.08);
+    color: var(--cyan);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(0,245,255,0.2);
+  }
+
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,245,255,0.06);
+    color: var(--text-main);
+    vertical-align: top;
+  }
+
+  .data-table tr:hover td {
+    background: rgba(0,245,255,0.03);
+  }
+
+  .data-table a {
+    color: var(--cyan-dim);
+    text-decoration: none;
+    font-size: 0.75rem;
+    word-break: break-all;
+  }
+  .data-table a:hover { color: var(--cyan); }
+
+  /* TYPEWRITER */
+  .typewriter {
+    overflow: hidden;
+    border-right: 2px solid var(--cyan);
+    white-space: nowrap;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--cyan);
+    width: 0;
+    animation: typing 3s steps(60, end) 0.5s forwards, blink-caret 0.7s step-end infinite;
+    display: inline-block;
+  }
+
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: var(--cyan); }
+  }
+
+  /* TICKER */
+  .ticker-wrap {
+    background: rgba(0,0,0,0.5);
+    border-top: 1px solid var(--blue-border);
+    border-bottom: 1px solid var(--blue-border);
+    overflow: hidden;
+    padding: 8px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .ticker {
+    display: flex;
+    animation: ticker-scroll 30s linear infinite;
+    white-space: nowrap;
+  }
+
+  .ticker span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--cyan-dim);
+    padding: 0 40px;
+  }
+
+  .ticker span.hi { color: var(--cyan); }
+  .ticker span.alert-t { color: var(--red-alert); }
+
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* CONCLUSION */
+  .conclusion-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0,245,255,0.07);
+    align-items: flex-start;
+  }
+  .conclusion-item:last-child { border-bottom: none; }
+
+  .conc-bullet {
+    width: 6px;
+    height: 6px;
+    background: var(--cyan);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+    box-shadow: 0 0 8px var(--cyan);
+    animation: counter-glow 2s ease-in-out infinite;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--blue-border);
+    margin-top: 60px;
+  }
+
+  footer p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    line-height: 2;
+  }
+
+  .neon-line {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    box-shadow: 0 0 10px var(--cyan);
+    margin: 16px auto;
+    animation: neon-line-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes neon-line-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* CASE CARD */
+  .case-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,61,90,0.2);
+    border-left: 3px solid var(--red-alert);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .case-card:hover {
+    border-color: rgba(255,61,90,0.5);
+    box-shadow: 0 0 14px rgba(255,61,90,0.1);
+  }
+
+  .case-card .case-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    color: var(--red-alert);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .case-card p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-main);
+  }
+
+  /* NORM BADGE */
+  .norm-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(0,245,255,0.08);
+    border: 1px solid rgba(0,245,255,0.25);
+    color: var(--cyan-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    margin: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--neon-blue));
+    box-shadow: 0 0 8px var(--cyan);
+    z-index: 9998;
+    transition: width 0.1s ease;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .stats-cards { grid-template-columns: repeat(2, 1fr); }
+    .menu-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-indicator" id="scrollBar"></div>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span class="hi">// INVESTIGACIÓN EXPLORATORIA — PROVINCIA DE SAN JUAN, ARGENTINA</span>
+    <span>◆</span>
+    <span class="alert-t">⚠ BRECHA DOCUMENTAL CRÍTICA DETECTADA</span>
+    <span>◆</span>
+    <span>USUARIOS DE SUSTANCIAS // DERECHOS HUMANOS</span>
+    <span>◆</span>
+    <span class="hi">VIH: 130–150 diagnósticos anuales en San Juan</span>
+    <span>◆</span>
+    <span>50% POBLACIÓN CARCELARIA POR CANNABIS</span>
+    <span>◆</span>
+    <span class="alert-t">⚠ LEY 26.657 INCUMPLIDA</span>
+    <span>◆</span>
+    <span>// INVESTIGACIÓN EXPLORATORIA — PROVINCIA DE SAN JUAN, ARGENTINA</span>
+    <span>◆</span>
+    <span class="alert-t">⚠ BRECHA DOCUMENTAL CRÍTICA DETECTADA</span>
+    <span>◆</span>
+    <span>USUARIOS DE SUSTANCIAS // DERECHOS HUMANOS</span>
+    <span>◆</span>
+    <span class="hi">VIH: 130–150 diagnósticos anuales en San Juan</span>
+    <span>◆</span>
+    <span>50% POBLACIÓN CARCELARIA POR CANNABIS</span>
+    <span>◆</span>
+    <span class="alert-t">⚠ LEY 26.657 INCUMPLIDA</span>
+    <span>◆</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header id="top">
+  <div class="header-tag">[ DOCUMENTO DE INVESTIGACIÓN — 2025 ]</div>
+  <h1 class="main-title">USUARIOS DE SUSTANCIAS<br>Y DERECHOS HUMANOS</h1>
+  <div class="subtitle">DESDE LA DEMOCRACIA A LA ACTUALIDAD</div>
+  <div class="research-tag">// Investigación exploratoria — Provincia de San Juan, Argentina</div>
+  <div class="hex-deco">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+</header>
+
+<!-- MENU -->
+<div id="menu">
+  <div class="menu-label">&gt;&gt; ÍNDICE DE CONTENIDOS &lt;&lt;</div>
+  <div class="menu-grid">
+    <a onclick="scrollToId('sec1');return false;" href="javascript:void(0)" class="menu-btn">
+      <span class="btn-num">01</span>
+      SALUD SEXUAL Y REPRODUCTIVA<br>Evolución de ETS en San Juan
+      <span class="btn-arrow">→</span>
+    </a>
+    <a onclick="scrollToId('sec2');return false;" href="javascript:void(0)" class="menu-btn">
+      <span class="btn-num">02</span>
+      CRIMINALIZACIÓN<br>Aplicación selectiva de la Ley 23.737
+      <span class="btn-arrow">→</span>
+    </a>
+    <a onclick="scrollToId('sec3');return false;" href="javascript:void(0)" class="menu-btn">
+      <span class="btn-num">03</span>
+      CENTROS CLANDESTINOS<br>Muertes y lesiones
+      <span class="btn-arrow">→</span>
+    </a>
+    <a onclick="scrollToId('sec4');return false;" href="javascript:void(0)" class="menu-btn">
+      <span class="btn-num">04</span>
+      DERIVACIÓN JUDICIAL<br>Centros no registrados
+      <span class="btn-arrow">→</span>
+    </a>
+    <a onclick="scrollToId('sec5');return false;" href="javascript:void(0)" class="menu-btn">
+      <span class="btn-num">05</span>
+      CONCLUSIONES<br>Hallazgos e incumplimientos
+      <span class="btn-arrow">→</span>
+    </a>
+    <a onclick="scrollToId('sec6');return false;" href="javascript:void(0)" class="menu-btn">
+      <span class="btn-num">06</span>
+      FUENTES Y ENLACES<br>Referencias documentales
+      <span class="btn-arrow">→</span>
+    </a>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 1 -->
+<section class="section" id="sec1">
+  <div class="section-header">
+    <span class="section-num">// SECCIÓN 01</span>
+    <h2 class="section-title">SALUD SEXUAL Y REPRODUCTIVA<br>Evolución de ETS en San Juan</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">1.1 — Marco de derechos</div>
+    </div>
+    <div class="sub-body">
+      <ul>
+        <li>El acceso a medios de barrera (profilácticos) es fundamental para el ejercicio pleno de los derechos sexuales y reproductivos.</li>
+        <li>La ausencia de datos desagregados y series históricas públicas constituye una violación al derecho a la información y a la salud (Art. 42 CN; Ley 26.529; Pacto de San José de Costa Rica).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">1.2 — Estadísticas estatales disponibles</div>
+    </div>
+    <div class="sub-body">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <span class="stat-val">1.119</span>
+          <span class="stat-label">Casos de sífilis<br>+30% interanual (2025)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val">150</span>
+          <span class="stat-label">Diagnósticos VIH<br>anuales (máx.)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val">50%</span>
+          <span class="stat-label">Diagnósticos VIH<br>tardíos</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val">~50</span>
+          <span class="stat-label">Casos Hepatitis C<br>por año</span>
+        </div>
+      </div>
+      <div class="info-box">
+        <strong style="color:var(--cyan)">► Nivel nacional</strong> — Ministerio de Salud de la Nación<br>
+        Portal de Datos Abiertos: <a href="https://datos.gob.ar/dataset/salud" target="_blank">datos.gob.ar/dataset/salud</a><br>
+        Dirección de SIDA, ITS, Hepatitis: <a href="https://www.argentina.gob.ar/salud/vih-its" target="_blank">argentina.gob.ar/salud/vih-its</a>
+      </div>
+      <div class="info-box">
+        <strong style="color:var(--cyan)">► Nivel provincial</strong> — Ministerio de Salud de San Juan<br>
+        Programa Provincial de Respuesta al VIH, ITS y Hepatitis Virales<br>
+        Contacto: <a href="mailto:programa.vih@sanjuan.gov.ar">programa.vih@sanjuan.gov.ar</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">1.3 — Brecha documental crítica</div>
+    </div>
+    <div class="sub-body">
+      <div class="alert-box">No existe serie histórica pública desagregada (1983–actualidad) sobre evolución de ETS en San Juan.</div>
+      <div class="alert-box">La implementación de sistemas de notificación nominal es reciente (2022–2024), lo que impide análisis comparativos.</div>
+      <div class="alert-box">Esta ausencia vulnera el derecho a la salud (Art. 42 CN; Ley 26.657), derecho a la información (Ley 27.275) y obligaciones internacionales de monitoreo epidemiológico (OMS/OPS).</div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">1.4 — Fuentes periodísticas</div>
+    </div>
+    <div class="sub-body">
+      <ul>
+        <li>Tiempo de San Juan: "Aumentan los casos de sífilis en la provincia" (2025)</li>
+        <li>Diario de Cuyo: Cobertura sobre campañas de prevención de ITS</li>
+        <li>0264 Noticias: Reportes sobre acceso a preservativos en centros de salud</li>
+      </ul>
+    </div>
+  </div>
+
+  <a onclick="scrollToId('menu');return false;" href="javascript:void(0)" class="back-btn">◂ VOLVER AL MENÚ</a>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 2 -->
+<section class="section" id="sec2">
+  <div class="section-header">
+    <span class="section-num">// SECCIÓN 02</span>
+    <h2 class="section-title">CRIMINALIZACIÓN<br>Aplicación selectiva de la Ley 23.737</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">2.1 — Datos clave relevados (San Juan)</div>
+    </div>
+    <div class="sub-body">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <span class="stat-val">50%</span>
+          <span class="stat-label">Población carcelaria con infracciones vinculadas a cannabis</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val">90%</span>
+          <span class="stat-label">Detenciones por abordaje policial directo (no judicial)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val">0,01%</span>
+          <span class="stat-label">Causas iniciadas por orden judicial (~8 en Penal Chimbas)</span>
+        </div>
+      </div>
+      <div class="info-box">
+        <strong style="color:var(--cyan)">Perfil socioeconómico predominante:</strong> personas que no completaron el nivel secundario y sin empleo estable al momento de la infracción.
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">2.2 — Estadísticas estatales disponibles</div>
+    </div>
+    <div class="sub-body">
+      <div class="info-box">
+        <strong style="color:var(--cyan)">► PROCUNAR</strong> — Plataforma Interactiva de Información Estadística<br>
+        <a href="https://www.mpf.gob.ar/procunar/estadisticas/" target="_blank">mpf.gob.ar/procunar/estadisticas</a><br>
+        Permite filtrar por: jurisdicción (San Juan), tipo penal (art. 14, tenencia para consumo), modalidad de inicio.
+      </div>
+      <div class="stat-row">
+        <div class="stat-icon">▸</div>
+        <div class="stat-text"><strong style="color:var(--cyan)">2022:</strong> +77% en causas por tenencia para consumo personal vs. 2021 — Informe PROCUNAR</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-icon">▸</div>
+        <div class="stat-text"><strong style="color:var(--cyan)">2014–2016:</strong> La tenencia para consumo representó ~39% de los casos en jurisdicciones descentralizadas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">2.3 — Brecha documental crítica</div>
+    </div>
+    <div class="sub-body">
+      <div class="alert-box">No hay desagregación pública por provincia con variables como origen social, nivel educativo, situación laboral, ni evolución histórica desde 1983.</div>
+      <div class="alert-box">Opacidad que vulnera el principio de publicidad (Art. 1°, Ley 27.275), derecho a la defensa (Art. 18 CN) y obligación de producir información para políticas públicas basadas en evidencia.</div>
+    </div>
+  </div>
+
+  <a onclick="scrollToId('menu');return false;" href="javascript:void(0)" class="back-btn">◂ VOLVER AL MENÚ</a>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 3 -->
+<section class="section" id="sec3">
+  <div class="section-header">
+    <span class="section-num">// SECCIÓN 03</span>
+    <h2 class="section-title">CENTROS CLANDESTINOS<br>Muertes y lesiones en centros de "recuperación"</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">3.1 — Marco normativo</div>
+    </div>
+    <div class="sub-body">
+      <ul>
+        <li><strong style="color:var(--cyan-dim)">Ley Nacional de Salud Mental 26.657:</strong> reconoce a las personas usuarias como sujetos de derecho, con derecho al diagnóstico, tratamiento y participación.</li>
+        <li>Prohíbe internaciones compulsivas sin debido proceso y exige notificación judicial en <strong style="color:var(--cyan)">10 horas</strong> (Art. 21).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">3.2 — Casos documentados a nivel nacional</div>
+    </div>
+    <div class="sub-body">
+      <div class="case-card">
+        <div class="case-title">▶ Moreno, PBA (2023)</div>
+        <p>Rescate de <strong style="color:var(--red-alert)">87 personas</strong> (10 menores) en centro clandestino. Detenidos por reducción a servidumbre; sin habilitación ni profesionales de salud.</p>
+        <br><a href="https://www.pagina12.com.ar/centros-clandestinos-rehabilitacion" target="_blank">pagina12.com.ar →</a>
+      </div>
+      <div class="case-card">
+        <div class="case-title">▶ Caso "Teto" Medina / "La razón de vivir"</div>
+        <p>Investigación por reducción a servidumbre y abandono de persona. Centro operaba sin autorización como comunidad terapéutica.</p>
+        <br><a href="https://www.pagina12.com.ar/484080-la-detencion-del-teto-medina" target="_blank">pagina12.com.ar →</a>
+      </div>
+      <div class="case-card">
+        <div class="case-title">▶ Incendio en "Resiliencia San Fernando", Pilar (2022)</div>
+        <p><strong style="color:var(--red-alert)">4 personas fallecieron</strong>. Víctimas sobremedicadas. Centro sin habilitación.</p>
+        <br><a href="https://www.infobae.com/sociedad/2022/03/15/incendio-centro-adicciones" target="_blank">infobae.com →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">3.3 — Características comunes denunciadas</div>
+    </div>
+    <div class="sub-body">
+      <ul>
+        <li>Funcionamiento a puertas cerradas, sin supervisión estatal.</li>
+        <li>Internaciones involuntarias a pedido de familiares, sin intervención judicial.</li>
+        <li>Ausencia de equipos interdisciplinarios (médicos, psicólogos, trabajadores sociales).</li>
+        <li>Métodos basados en "premios y castigos", trabajos forzados, aislamiento.</li>
+        <li>Falta de notificación de internaciones al Órgano de Revisión.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">3.4 — Situación en San Juan: brecha crítica</div>
+    </div>
+    <div class="sub-body">
+      <div class="alert-box">No hay listado público del Ministerio de Salud provincial sobre centros habilitados vs. no habilitados para tratamiento de adicciones.</div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">3.5 — Fuentes para monitoreo continuo</div>
+    </div>
+    <div class="sub-body">
+      <ul>
+        <li>El Planteo: <a href="https://elplanteo.com/centros-clandestinos-de-rehabilitacion/" target="_blank">elplanteo.com →</a></li>
+        <li>ARDA (Asociación de Reducción de Daños de Argentina): contacto para reporte de casos.</li>
+        <li>Colegios profesionales: Trabajo Social, Psicología, Medicina (San Juan).</li>
+      </ul>
+    </div>
+  </div>
+
+  <a onclick="scrollToId('menu');return false;" href="javascript:void(0)" class="back-btn">◂ VOLVER AL MENÚ</a>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 4 -->
+<section class="section" id="sec4">
+  <div class="section-header">
+    <span class="section-num">// SECCIÓN 04</span>
+    <h2 class="section-title">DERIVACIÓN JUDICIAL<br>A centros no registrados</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">4.1 — Marco legal aplicable</div>
+    </div>
+    <div class="sub-body">
+      <ul>
+        <li><strong style="color:var(--cyan-dim)">Ley 26.657, Art. 21:</strong> Toda internación involuntaria debe notificarse al juez competente y al Órgano de Revisión en plazo de <strong style="color:var(--cyan)">10 horas</strong>.</li>
+        <li><strong style="color:var(--cyan-dim)">Ley Provincial 623-Q y Decreto 1681-Q (San Juan):</strong> Promueven Sistema de Protección de la Salud Mental, pero sin evidencia pública de implementación efectiva para centros de adicciones.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">4.2 — Registro de prestadores</div>
+    </div>
+    <div class="sub-body">
+      <div class="stat-row">
+        <div class="stat-icon">▸</div>
+        <div class="stat-text"><strong style="color:var(--cyan)">20 centros</strong> categorizados en el Registro Nacional de Prestadores para personas con discapacidad (fuente: SI San Juan).</div>
+      </div>
+      <div class="alert-box">No hay listado público específico para centros de tratamiento de adicciones.</div>
+      <div class="alert-box">No hay transparencia sobre cuántos centros de adicciones están realmente habilitados.</div>
+    </div>
+  </div>
+
+  <a onclick="scrollToId('menu');return false;" href="javascript:void(0)" class="back-btn">◂ VOLVER AL MENÚ</a>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 5 -->
+<section class="section" id="sec5">
+  <div class="section-header">
+    <span class="section-num">// SECCIÓN 05</span>
+    <h2 class="section-title">CONCLUSIONES<br>Hallazgos e incumplimientos normativos</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">5.1 — Hallazgos principales</div>
+    </div>
+    <div class="sub-body">
+      <div class="conclusion-item">
+        <div class="conc-bullet"></div>
+        <p>La ausencia de datos desagregados y series históricas sobre ETS, detenciones por drogas y centros de tratamiento en San Juan constituye una <strong style="color:var(--red-alert)">violación estructural a los derechos humanos</strong>.</p>
+      </div>
+      <div class="conclusion-item">
+        <div class="conc-bullet"></div>
+        <p>La criminalización selectiva de usuarios de cannabis afecta predominantemente a <strong style="color:var(--cyan)">personas en situación de vulnerabilidad socioeconómica</strong>.</p>
+      </div>
+      <div class="conclusion-item">
+        <div class="conc-bullet"></div>
+        <p>Persisten centros de "recuperación" operando al margen del sistema de salud, con <strong style="color:var(--red-alert)">riesgos graves para la vida e integridad</strong> de las personas internadas.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-header">
+      <div class="sub-title">5.2 — Incumplimiento normativo detectado</div>
+    </div>
+    <div class="sub-body">
+      <div style="margin: 10px 0;">
+        <span class="norm-badge">Ley 26.657 — Salud Mental</span>
+        <span class="norm-badge">Ley 26.529 — Derechos del Paciente</span>
+        <span class="norm-badge">Convención Americana de DDHH</span>
+        <span class="norm-badge">Reglas de Bangkok</span>
+        <span class="norm-badge">Reglas de Mandela</span>
+      </div>
+    </div>
+  </div>
+
+  <a onclick="scrollToId('menu');return false;" href="javascript:void(0)" class="back-btn">◂ VOLVER AL MENÚ</a>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 6 -->
+<section class="section" id="sec6">
+  <div class="section-header">
+    <span class="section-num">// SECCIÓN 06</span>
+    <h2 class="section-title">FUENTES CONSULTADAS<br>Y ENLACES DE REFERENCIA</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>TEMA</th>
+            <th>FUENTE</th>
+            <th>ENLACE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ETS San Juan 2025</td>
+            <td>Tiempo de San Juan</td>
+            <td><a href="https://tiempodesanjuan.com" target="_blank">tiempodesanjuan.com →</a></td>
+          </tr>
+          <tr>
+            <td>Programa Provincial VIH/SIDA</td>
+            <td>SI San Juan</td>
+            <td><a href="https://si.sanjuan.edu.ar" target="_blank">si.sanjuan.edu.ar →</a></td>
+          </tr>
+          <tr>
+            <td>Ley Salud Mental Nacional</td>
+            <td>InfoLEG</td>
+            <td><a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/185000-189999/187000/norma.htm" target="_blank">infoleg.gob.ar →</a></td>
+          </tr>
+          <tr>
+            <td>Estadísticas PROCUNAR</td>
+            <td>Plataforma Interactiva</td>
+            <td><a href="https://www.mpf.gob.ar/procunar/estadisticas/" target="_blank">mpf.gob.ar →</a></td>
+          </tr>
+          <tr>
+            <td>Centros clandestinos (nacional)</td>
+            <td>El Planteo</td>
+            <td><a href="https://elplanteo.com/centros-clandestinos-de-rehabilitacion/" target="_blank">elplanteo.com →</a></td>
+          </tr>
+          <tr>
+            <td>Caso "Teto" Medina</td>
+            <td>Página/12</td>
+            <td><a href="https://www.pagina12.com.ar/484080-la-detencion-del-teto-medina-y-el-lado-oculto-de-las-granjas/" target="_blank">pagina12.com.ar →</a></td>
+          </tr>
+          <tr>
+            <td>Registro de prestadores San Juan</td>
+            <td>SI San Juan</td>
+            <td><a href="https://si.sanjuan.edu.ar" target="_blank">si.sanjuan.edu.ar →</a></td>
+          </tr>
+          <tr>
+            <td>Ley de Acceso a la Información</td>
+            <td>InfoLEG</td>
+            <td><a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/270000-274999/272271/norma.htm" target="_blank">infoleg.gob.ar →</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <a onclick="scrollToId('menu');return false;" href="javascript:void(0)" class="back-btn">◂ VOLVER AL MENÚ</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="neon-line"></div>
+  <p>USUARIOS DE SUSTANCIAS Y DERECHOS HUMANOS // DESDE LA DEMOCRACIA A LA ACTUALIDAD</p>
+  <p>Investigación exploratoria — Provincia de San Juan, Argentina — 2025</p>
+  <div class="neon-line"></div>
+  <p style="font-size:0.62rem; color: rgba(106,143,168,0.4); margin-top: 8px;">// END OF DOCUMENT //</p>
+</footer>
+
+<script>
+  // Smooth scroll to element by ID (avoids external link intercept)
+  function scrollToId(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const winScroll = document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById('scrollBar').style.width = scrolled + '%';
+  });
+
+  // Typewriter effect on visible elements
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.animationPlayState = 'running';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.typewriter').forEach(el => observer.observe(el));
+
+
+
+  // Menu button active highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const menuBtns = document.querySelectorAll('.menu-btn');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 200) current = s.getAttribute('id');
+    });
+    menuBtns.forEach(btn => {
+      btn.style.borderColor = '';
+      btn.style.boxShadow = '';
+      if (btn.getAttribute('href') === '#' + current) {
+        btn.style.borderColor = 'rgba(0,245,255,0.5)';
+        btn.style.boxShadow = '0 0 14px rgba(0,245,255,0.15)';
+      }
+    });
+  });
+</script>
+</body>
+</html>
